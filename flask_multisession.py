@@ -1,11 +1,11 @@
 import pymongo
 from pymongo import MongoClient
 
-__version_info__ = ('0', '2', '3')
+__version_info__ = ('1', '0', '0')
 __version__ = '.'.join(__version_info__)
-__author__ = 'Nikita Bobrov'
+__author__ = 'Ranjan Kumar Patel'
 __license__ = 'MIT/X11'
-__copyright__ = '(c) 2017 by Nikita Bobrov'
+__copyright__ = '(c) 2019 by Ranjan Kumar Patel'
 
 from datetime import datetime
 from uuid import uuid4
@@ -16,9 +16,9 @@ from flask.sessions import SessionInterface, SessionMixin
 class MongoSessionManager:
     collection_name = 'sessions'
 
-    def __init__(self, db='flask_multisession', permanent=True, *args, **kwargs):
+    def __init__(self, db='flask_multisession', permanent=True, MONGO_URI=None):
         self._permanent = permanent
-        self._client = MongoClient(*args, **kwargs)
+        self._client = MongoClient(MONGO_URI)
         self._db = self._client[db]
         self._collection = self._db[self.collection_name]
         self._check_indexes()
