@@ -1,7 +1,7 @@
 import pymongo
 from pymongo import MongoClient
 
-__version_info__ = ('1', '0', '0')
+__version_info__ = ('1', '2', '3')
 __version__ = '.'.join(__version_info__)
 __author__ = 'Ranjan Kumar Patel'
 __license__ = 'MIT/X11'
@@ -73,7 +73,7 @@ class MongoSessionManager:
         }
         if session.is_authenticated():
             data['user_id'] = session.user_id
-        self._collection.replace_one({'session_id': sid}, data, upsert=True)
+        self._collection.replace_one({'session_id': sid}, data, upsert=False)
 
     def logout_all_devices(self, session):
         if session.user_id is not None:
@@ -115,8 +115,8 @@ class MongoSession(CallbackDict, SessionMixin):
 class MongoSessionInterface(SessionInterface):
     collection_name = 'sessions'
 
-    def __init__(self, *args, **kwargs):
-        self._manager = MongoSessionManager(*args, **kwargs)
+    def __init__(self, db, MONGO_URI):
+        self._manager = MongoSessionManager(db=db, MONGO_URI=MONGO_URI)
 
     def open_session(self, app, request):
         sid = request.cookies.get(app.session_cookie_name)
