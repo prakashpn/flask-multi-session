@@ -32,7 +32,7 @@ setup(
     author_email='ranjanpatelbbsr@gmail.com',
     description='Mongo multidevice sessions for Flask apps',
     py_modules=['flask_multisession'],
-    zip_safe=False,
+    zip_safe=True,
     package_data={'': ['.travis.yml', 'LICENSE']},
     include_package_data=True,
     platforms='any',
