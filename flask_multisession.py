@@ -16,7 +16,7 @@ from flask.sessions import SessionInterface, SessionMixin
 class MongoSessionManager:
     collection_name = 'sessions'
 
-    def __init__(self, db='flask_multisession', permanent=True, MONGO_URI=None):
+    def __init__(self, db='oauth', permanent=True, MONGO_URI=None):
         self._permanent = permanent
         self._client = MongoClient(MONGO_URI)
         self._db = self._client[db]
@@ -73,13 +73,12 @@ class MongoSessionManager:
         }
         if session.is_authenticated():
             data['user_id'] = session.user_id
-        self._collection.replace_one({'session_id': sid}, data, upsert=False)
+        self._collection.replace_one({'session_id': sid}, data, upsert=True)
 
     def logout_all_devices(self, session):
         if session.user_id is not None:
-            self._collection.update_many(
-                {'user_id': session.user_id},
-                {'$unset': {'user_id': ''}}
+            self._collection.delete_many(
+                {'user_id': session.user_id}
             )
 
 
@@ -120,13 +119,16 @@ class MongoSessionInterface(SessionInterface):
 
     def open_session(self, app, request):
         sid = request.cookies.get(app.session_cookie_name)
+        print(sid, app.session_cookie_name, "open_session")
         return self._manager.get_session(sid)
 
     def save_session(self, app, session: MongoSession, response):
         domain = self.get_cookie_domain(app)
         sid = session.session_id
+        print(sid, app.session_cookie_name, "save_session")
         expired = self.get_expiration_time(app, session)
-        response.set_cookie(app.session_cookie_name, sid, expires=expired, httponly=True, domain=domain)
+        secure = self.get_cookie_secure(app)
+        response.set_cookie(app.session_cookie_name, sid, expires=expired, httponly=True, domain=domain, secure=True)
 
         if session.modified or expired:
             self._manager.update_session(session, expired)
