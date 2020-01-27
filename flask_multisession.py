@@ -77,8 +77,9 @@ class MongoSessionManager:
 
     def logout_all_devices(self, session):
         if session.user_id is not None:
-            self._collection.delete_many(
-                {'user_id': session.user_id}
+            self._collection.update_many(
+                {'user_id': session.user_id},
+                {'$unset': {'user_id': '', "data.user.id": "", "data.user.email": ""}}
             )
 
 
@@ -128,7 +129,7 @@ class MongoSessionInterface(SessionInterface):
         print(sid, app.session_cookie_name, "save_session")
         expired = self.get_expiration_time(app, session)
         secure = self.get_cookie_secure(app)
-        response.set_cookie(app.session_cookie_name, sid, expires=expired, httponly=False, domain=domain, secure=True)
+        response.set_cookie(app.session_cookie_name, sid, expires=expired, httponly=False, domain=domain, secure=False)
 
         if session.modified or expired:
             self._manager.update_session(session, expired)
