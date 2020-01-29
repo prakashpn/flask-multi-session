@@ -129,7 +129,8 @@ class MongoSessionInterface(SessionInterface):
         print(sid, app.session_cookie_name, "save_session")
         expired = self.get_expiration_time(app, session)
         secure = self.get_cookie_secure(app)
-        response.set_cookie(app.session_cookie_name, sid, expires=expired, httponly=False, domain=domain, secure=False)
+        response.set_cookie(app.session_cookie_name, sid, expires=expired, httponly=True, domain=domain, secure=True,
+                            samesite='Lax')
 
         if session.modified or expired:
             self._manager.update_session(session, expired)
