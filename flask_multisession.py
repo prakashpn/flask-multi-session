@@ -1,7 +1,7 @@
 import pymongo
 from pymongo import MongoClient
 
-__version_info__ = ('1', '2', '3')
+__version_info__ = ('10', '2', '3')
 __version__ = '.'.join(__version_info__)
 __author__ = 'Ranjan Kumar Patel'
 __license__ = 'MIT/X11'
@@ -129,8 +129,9 @@ class MongoSessionInterface(SessionInterface):
         print(sid, app.session_cookie_name, "save_session")
         expired = self.get_expiration_time(app, session)
         secure = self.get_cookie_secure(app)
-        response.set_cookie(app.session_cookie_name, sid, expires=expired, httponly=True, domain=domain, secure=True,
-                            samesite='Lax')
+        response.set_cookie(app.session_cookie_name, sid, expires=expired, httponly=True, domain=domain,
+                            secure=True,
+                            samesite='Strict')
 
         if session.modified or expired:
             self._manager.update_session(session, expired)
